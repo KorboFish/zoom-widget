@@ -5,10 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:zoom_widget/MultiTouchGestureRecognizer.dart';
 
 class Zoom extends StatefulWidget {
-  final double? maxZoomWidth, maxZoomHeight;
-
-  final double? width;
-  final double? height;
+  final double maxZoomWidth, maxZoomHeight;
 
   final Widget child;
   final Color backgroundColor;
@@ -28,11 +25,9 @@ class Zoom extends StatefulWidget {
 
   Zoom(
       {Key? key,
-      this.maxZoomWidth,
-      this.maxZoomHeight,
+      required this.maxZoomWidth,
+      required this.maxZoomHeight,
       required this.child,
-      @Deprecated('use maxZoomWidth instead') this.width,
-      @Deprecated('use maxZoomHeight instead') this.height,
       this.onPositionUpdate,
       this.onScaleUpdate,
       this.backgroundColor = Colors.grey,
@@ -96,9 +91,9 @@ class _ZoomState extends State<Zoom> with TickerProviderStateMixin {
               doubleTapScale,
               (globalConstraints!.maxHeight > globalConstraints!.maxWidth)
                   ? globalConstraints!.maxWidth /
-                      (widget.maxZoomWidth ?? widget.width!)
+                      widget.maxZoomWidth
                   : globalConstraints!.maxHeight /
-                      (widget.maxZoomHeight ?? widget.height!));
+                      widget.maxZoomHeight);
         }
 
         scaleProcess(globalConstraints);
@@ -132,41 +127,41 @@ class _ZoomState extends State<Zoom> with TickerProviderStateMixin {
   }
 
   void scaleFixPosition(constraints) {
-    if ((((widget.maxZoomHeight ?? widget.height!) * scale) >
+    if (((widget.maxZoomHeight * scale) >
             constraints.maxHeight) &&
         ((auxTop + localTop + centerTop + scaleTop) +
-                ((widget.maxZoomHeight ?? widget.height!) * scale)) <
+                (widget.maxZoomHeight * scale)) <
             constraints.maxHeight) {
       localTop += constraints.maxHeight -
           ((auxTop + localTop + centerTop + scaleTop) +
-              (widget.maxZoomHeight ?? widget.height!) * scale);
+              widget.maxZoomHeight * scale);
     }
 
-    if ((((widget.maxZoomWidth ?? widget.width!) * scale) >
+    if (((widget.maxZoomWidth * scale) >
             constraints.maxWidth) &&
         ((auxLeft + localLeft + centerLeft + scaleLeft) +
-                ((widget.maxZoomWidth ?? widget.width!) * scale)) <
+                (widget.maxZoomWidth * scale)) <
             constraints.maxWidth) {
       localLeft += constraints.maxWidth -
           ((auxLeft + localLeft + centerLeft + scaleLeft) +
-              (widget.maxZoomWidth ?? widget.width!) * scale);
+              widget.maxZoomWidth * scale);
     }
 
-    if (((widget.maxZoomHeight ?? widget.height!) * scale) <
+    if ((widget.maxZoomHeight * scale) <
         constraints.maxHeight) {
       if (widget.centerOnScale) {
         centerTop = (constraints.maxHeight -
-                (widget.maxZoomHeight ?? widget.height!) * scale) /
+                widget.maxZoomHeight * scale) /
             2;
       }
     } else
       centerTop = 0.0;
 
-    if (((widget.maxZoomWidth ?? widget.width!) * scale) <
+    if ((widget.maxZoomWidth * scale) <
         constraints.maxWidth) {
       if (widget.centerOnScale) {
         centerLeft = (constraints.maxWidth -
-                (widget.maxZoomWidth ?? widget.width!) * scale) /
+                widget.maxZoomWidth * scale) /
             2;
       }
     } else
@@ -176,8 +171,8 @@ class _ZoomState extends State<Zoom> with TickerProviderStateMixin {
         scale,
         1.0,
         (constraints.maxHeight > constraints.maxWidth)
-            ? constraints.maxWidth / (widget.maxZoomWidth ?? widget.width)
-            : constraints.maxHeight / (widget.maxZoomHeight ?? widget.height),
+            ? constraints.maxWidth / widget.maxZoomWidth
+            : constraints.maxHeight / widget.maxZoomHeight,
         1.0,
         0.0);
   }
@@ -199,7 +194,7 @@ class _ZoomState extends State<Zoom> with TickerProviderStateMixin {
       double preScaleLeft =
           (relativeMidlePoint.dx - currentMidlePoint.dx) * -scale;
       if ((auxLeft + localLeft + preScaleLeft) >
-          -(((widget.maxZoomWidth ?? widget.width!) * scale) -
+          -((widget.maxZoomWidth * scale) -
               constraints.maxWidth * scale)) scaleLeft = preScaleLeft;
     }
 
@@ -213,7 +208,7 @@ class _ZoomState extends State<Zoom> with TickerProviderStateMixin {
       double preScaleTop =
           (relativeMidlePoint.dy - currentMidlePoint.dy) * -scale;
       if ((auxTop + localTop + preScaleTop) >
-          -(((widget.maxZoomHeight ?? widget.height!) * scale) -
+          -((widget.maxZoomHeight * scale) -
               constraints.maxHeight * scale)) scaleTop = preScaleTop;
     }
   }
@@ -230,47 +225,47 @@ class _ZoomState extends State<Zoom> with TickerProviderStateMixin {
     if (auxLeft > 0) auxLeft = 0;
     if (auxTop > 0) auxTop = 0;
 
-    if ((widget.maxZoomHeight ?? widget.height!) * scale <
+    if (widget.maxZoomHeight * scale <
             constraints.maxHeight &&
         auxTop < 0) {
       auxTop = 0;
     }
 
-    if ((widget.maxZoomWidth ?? widget.width!) * scale < constraints.maxWidth &&
+    if (widget.maxZoomWidth * scale < constraints.maxWidth &&
         auxLeft < 0) {
       auxLeft = 0;
     }
 
     if (widget.centerOnScale) {
       if (portrait) {
-        if ((widget.maxZoomHeight ?? widget.height!) * scale <
+        if (widget.maxZoomHeight * scale <
             constraints.maxHeight) {
           centerTop = (constraints.maxHeight -
-                  (widget.maxZoomHeight ?? widget.height!) * scale) /
+                  widget.maxZoomHeight * scale) /
               2;
         }
       } else {
-        if ((widget.maxZoomWidth ?? widget.width!) * scale <
+        if (widget.maxZoomWidth * scale <
             constraints.maxWidth) {
           centerLeft = (constraints.maxWidth -
-                  (widget.maxZoomWidth ?? widget.width!) * scale) /
+                  widget.maxZoomWidth * scale) /
               2;
         }
       }
     }
 
     if (constraints.maxHeight > constraints.maxWidth &&
-        (widget.maxZoomWidth ?? widget.width!) * scale < constraints.maxWidth) {
+        widget.maxZoomWidth * scale < constraints.maxWidth) {
       setState(() {
-        scale = constraints.maxWidth / (widget.maxZoomWidth ?? widget.width);
+        scale = constraints.maxWidth / widget.maxZoomWidth;
       });
     }
 
     if (constraints.maxWidth > constraints.maxHeight &&
-        (widget.maxZoomHeight ?? widget.height!) * scale <
+        widget.maxZoomHeight * scale <
             constraints.maxHeight) {
       setState(() {
-        scale = constraints.maxHeight / (widget.maxZoomHeight ?? widget.height);
+        scale = constraints.maxHeight / widget.maxZoomHeight;
       });
     }
   }
@@ -287,26 +282,26 @@ class _ZoomState extends State<Zoom> with TickerProviderStateMixin {
               0.0,
               1.0,
               (constraints.maxHeight > constraints.maxWidth)
-                  ? constraints.maxWidth / (widget.maxZoomWidth ?? widget.width!)
+                  ? constraints.maxWidth / widget.maxZoomWidth
                   : constraints.maxHeight /
-                      (widget.maxZoomHeight ?? widget.height!));
+                      widget.maxZoomHeight);
           initOrientation = true;
           portrait =
               (constraints.maxHeight > constraints.maxWidth) ? true : false;
 
           if (widget.centerOnScale) {
             if (portrait) {
-              if ((widget.maxZoomHeight ?? widget.height!) * scale <
+              if (widget.maxZoomHeight * scale <
                   constraints.maxHeight) {
                 centerTop = (constraints.maxHeight -
-                        (widget.maxZoomHeight ?? widget.height!) * scale) /
+                        widget.maxZoomHeight * scale) /
                     2;
               }
             } else {
-              if ((widget.maxZoomWidth ?? widget.width!) * scale <
+              if (widget.maxZoomWidth * scale <
                   constraints.maxWidth) {
                 centerLeft = (constraints.maxWidth -
-                        (widget.maxZoomWidth ?? widget.width!) * scale) /
+                        widget.maxZoomWidth * scale) /
                     2;
               }
             }
@@ -403,9 +398,9 @@ class _ZoomState extends State<Zoom> with TickerProviderStateMixin {
                       scale = preScale;
                     }
                   } else if (changeScale > details.scale &&
-                      ((widget.maxZoomWidth ?? widget.width!) * scale >
+                      (widget.maxZoomWidth * scale >
                               constraints.maxWidth ||
-                          (widget.maxZoomHeight ?? widget.height!) * scale >
+                          widget.maxZoomHeight * scale >
                               constraints.maxHeight)) {
                     double preScale = scale -
                         (changeScale - details.scale) / widget.zoomSensibility;
@@ -413,13 +408,13 @@ class _ZoomState extends State<Zoom> with TickerProviderStateMixin {
                     if (portrait) {
                       if (preScale >
                           (constraints.maxWidth /
-                              (widget.maxZoomWidth ?? widget.width!))) {
+                              widget.maxZoomWidth)) {
                         scale = preScale;
                       }
                     } else {
                       if (preScale >
                           (constraints.maxHeight /
-                              (widget.maxZoomHeight ?? widget.height!))) {
+                              widget.maxZoomHeight)) {
                         scale = preScale;
                       }
                     }
@@ -437,26 +432,26 @@ class _ZoomState extends State<Zoom> with TickerProviderStateMixin {
                   if (details.focalPoint.dy > changeTop &&
                       (auxTop + up) < 0 &&
                       (auxTop + up) >
-                          -(((widget.maxZoomHeight ?? widget.height!)) * scale -
+                          -((widget.maxZoomHeight) * scale -
                               constraints.maxHeight)) {
                     localTop = up;
                   } else if (changeTop > details.focalPoint.dy &&
                       (auxTop + down) < 0 &&
                       (auxTop + down) >
-                          -(((widget.maxZoomHeight ?? widget.height!)) * scale -
+                          -((widget.maxZoomHeight) * scale -
                               constraints.maxHeight)) {
                     localTop = down;
                   }
                   if (details.focalPoint.dx > changeLeft &&
                       (auxLeft + right) < 0 &&
                       (auxLeft + right) >
-                          -(((widget.maxZoomWidth ?? widget.width!) * scale) -
+                          -((widget.maxZoomWidth * scale) -
                               constraints.maxWidth)) {
                     localLeft = right;
                   } else if (changeLeft > details.focalPoint.dx &&
                       (auxLeft + left) < 0 &&
                       (auxLeft + left) >
-                          -(((widget.maxZoomWidth ?? widget.width!) * scale) -
+                          -((widget.maxZoomWidth * scale) -
                               constraints.maxWidth)) {
                     localLeft = left;
                   }
@@ -490,8 +485,8 @@ class _ZoomState extends State<Zoom> with TickerProviderStateMixin {
                             boxShadow: widget.canvasShadow != null
                                 ? [widget.canvasShadow!]
                                 : null),
-                        width: (widget.maxZoomWidth ?? widget.width),
-                        height: (widget.maxZoomHeight ?? widget.height),
+                        width: widget.maxZoomWidth,
+                        height: widget.maxZoomHeight,
                         child: widget.child,
                       ),
                     ),
@@ -499,10 +494,10 @@ class _ZoomState extends State<Zoom> with TickerProviderStateMixin {
                   Positioned(
                     top: constraints.maxHeight - widget.scrollWeight,
                     left: -(auxLeft + localLeft + centerLeft + scaleLeft) /
-                        (((widget.maxZoomWidth ?? widget.width!) * scale) /
+                        ((widget.maxZoomWidth * scale) /
                             constraints.maxWidth),
                     child: Opacity(
-                      opacity: ((widget.maxZoomWidth ?? widget.width!) * scale <=
+                      opacity: (widget.maxZoomWidth * scale <=
                                   constraints.maxWidth ||
                               !widget.enableScroll)
                           ? 0
@@ -510,7 +505,7 @@ class _ZoomState extends State<Zoom> with TickerProviderStateMixin {
                       child: Container(
                         height: widget.scrollWeight,
                         width: constraints.maxWidth /
-                            (((widget.maxZoomWidth ?? widget.width!) * scale) /
+                            ((widget.maxZoomWidth * scale) /
                                 constraints.maxWidth),
                         color: widget.colorScrollBars,
                       ),
@@ -518,12 +513,12 @@ class _ZoomState extends State<Zoom> with TickerProviderStateMixin {
                   ),
                   Positioned(
                     top: -(auxTop + localTop + centerTop + scaleTop) /
-                        (((widget.maxZoomHeight ?? widget.height!) * scale) /
+                        ((widget.maxZoomHeight * scale) /
                             constraints.maxHeight),
                     left: constraints.maxWidth - widget.scrollWeight,
                     child: Opacity(
                       opacity:
-                          ((widget.maxZoomHeight ?? widget.height!) * scale <=
+                          (widget.maxZoomHeight * scale <=
                                       constraints.maxHeight ||
                                   !widget.enableScroll)
                               ? 0
@@ -531,7 +526,7 @@ class _ZoomState extends State<Zoom> with TickerProviderStateMixin {
                       child: Container(
                         width: widget.scrollWeight,
                         height: constraints.maxHeight /
-                            (((widget.maxZoomHeight ?? widget.height!) * scale) /
+                            ((widget.maxZoomHeight * scale) /
                                 constraints.maxHeight),
                         color: widget.colorScrollBars,
                       ),
