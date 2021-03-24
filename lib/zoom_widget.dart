@@ -63,14 +63,14 @@ class _ZoomState extends State<Zoom> with TickerProviderStateMixin {
   double scale = 1.0;
   double changeScale = 0.0;
   double zoom = 0.0;
-  Offset midlePoint = Offset(0.0, 0.0);
-  Offset relativeMidlePoint = Offset(0.0, 0.0);
+  Offset middlePoint = Offset(0.0, 0.0);
+  Offset relativeMiddlePoint = Offset(0.0, 0.0);
   bool initOrientation = false;
   late bool portrait;
   late AnimationController scaleAnimation;
   late bool doubleTapDown;
   double doubleTapScale = 0.0;
-  BoxConstraints? globalConstraints;
+  late BoxConstraints globalConstraints;
 
   @override
   void initState() {
@@ -81,7 +81,7 @@ class _ZoomState extends State<Zoom> with TickerProviderStateMixin {
           scale = map(scaleAnimation.value, 0.0, 1.0, doubleTapScale, 1.0);
         } else {
           scale = map(scaleAnimation.value, 0.0, 1.0, doubleTapScale,
-              (globalConstraints!.maxHeight > globalConstraints!.maxWidth) ? globalConstraints!.maxWidth / widget.maxZoomWidth : globalConstraints!.maxHeight / widget.maxZoomHeight);
+              (globalConstraints.maxHeight > globalConstraints.maxWidth) ? globalConstraints.maxWidth / widget.maxZoomWidth : globalConstraints.maxHeight / widget.maxZoomHeight);
         }
 
         scaleProcess(globalConstraints);
@@ -138,25 +138,25 @@ class _ZoomState extends State<Zoom> with TickerProviderStateMixin {
   }
 
   void scaleProcess(constraints) {
-    Offset currentMidlePoint = Offset(((auxLeft + localLeft + centerLeft) * -1 + midlePoint.dx) * (1 / scale) - localLeft, ((auxTop + localTop + centerTop) * -1 + midlePoint.dy) * (1 / scale));
+    Offset currentMiddlePoint = Offset(((auxLeft + localLeft + centerLeft) * -1 + middlePoint.dx) * (1 / scale) - localLeft, ((auxTop + localTop + centerTop) * -1 + middlePoint.dy) * (1 / scale));
 
-    if (currentMidlePoint.dx > relativeMidlePoint.dx) {
-      double preScaleLeft = (currentMidlePoint.dx - relativeMidlePoint.dx) * scale;
+    if (currentMiddlePoint.dx > relativeMiddlePoint.dx) {
+      double preScaleLeft = (currentMiddlePoint.dx - relativeMiddlePoint.dx) * scale;
       if (auxLeft + localLeft + preScaleLeft < 0) {
         scaleLeft = preScaleLeft;
       }
     } else {
-      double preScaleLeft = (relativeMidlePoint.dx - currentMidlePoint.dx) * -scale;
+      double preScaleLeft = (relativeMiddlePoint.dx - currentMiddlePoint.dx) * -scale;
       if ((auxLeft + localLeft + preScaleLeft) > -((widget.maxZoomWidth * scale) - constraints.maxWidth * scale)) scaleLeft = preScaleLeft;
     }
 
-    if (currentMidlePoint.dy > relativeMidlePoint.dy) {
-      double preScaleTop = (currentMidlePoint.dy - relativeMidlePoint.dy) * scale;
+    if (currentMiddlePoint.dy > relativeMiddlePoint.dy) {
+      double preScaleTop = (currentMiddlePoint.dy - relativeMiddlePoint.dy) * scale;
       if (auxTop + localTop + preScaleTop < 0) {
         scaleTop = preScaleTop;
       }
     } else {
-      double preScaleTop = (relativeMidlePoint.dy - currentMidlePoint.dy) * -scale;
+      double preScaleTop = (relativeMiddlePoint.dy - currentMiddlePoint.dy) * -scale;
       if ((auxTop + localTop + preScaleTop) > -((widget.maxZoomHeight * scale) - constraints.maxHeight * scale)) scaleTop = preScaleTop;
     }
   }
@@ -255,20 +255,20 @@ class _ZoomState extends State<Zoom> with TickerProviderStateMixin {
               (MultiTouchGestureRecognizer instance) {
                 instance.onSingleTap = (point) {
                   if (widget.doubleTapZoom) {
-                    midlePoint = point;
-                    relativeMidlePoint = Offset(((auxLeft + localLeft + centerLeft) * -1 + midlePoint.dx) * (1 / scale), ((auxTop + localTop + centerTop) * -1 + midlePoint.dy) * (1 / scale));
+                    middlePoint = point;
+                    relativeMiddlePoint = Offset(((auxLeft + localLeft + centerLeft) * -1 + middlePoint.dx) * (1 / scale), ((auxTop + localTop + centerTop) * -1 + middlePoint.dy) * (1 / scale));
                   }
                 };
                 instance.onMultiTap = (firstPoint, secondPoint) {
-                  midlePoint = Offset((firstPoint.dx + secondPoint.dx) / 2.0, (firstPoint.dy + secondPoint.dy) / 2.0);
+                  middlePoint = Offset((firstPoint.dx + secondPoint.dx) / 2.0, (firstPoint.dy + secondPoint.dy) / 2.0);
 
-                  relativeMidlePoint = Offset(((auxLeft + localLeft + centerLeft) * -1 + midlePoint.dx) * (1 / scale), ((auxTop + localTop + centerTop) * -1 + midlePoint.dy) * (1 / scale));
+                  relativeMiddlePoint = Offset(((auxLeft + localLeft + centerLeft) * -1 + middlePoint.dx) * (1 / scale), ((auxTop + localTop + centerTop) * -1 + middlePoint.dy) * (1 / scale));
                 };
               },
             ),
           },
           child: GestureDetector(
-            onTap: (widget.onTap != null ? widget.onTap! : null),
+            onTap: widget.onTap,
             onDoubleTap: () {
               if (widget.doubleTapZoom) {
                 doubleTapScale = scale;
